@@ -1,10 +1,13 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
-const router = express.Router();
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
-const prisma = require("../config/prisma");
-const { body, validationResult } = require("express-validator");
+import { Router } from "express";
+import bcrypt from "bcryptjs";
+const { hash, compare } = bcrypt;
+const router = Router();
+import jwt from "jsonwebtoken";
+const { sign } = jwt;
+import dotenv from "dotenv";
+dotenv.config();
+import prisma from "../config/prisma.mjs";
+import { body, validationResult } from "express-validator";
 
 router.post(
   "/register",
@@ -49,7 +52,7 @@ router.post(
         });
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await hash(password, 10);
       const user = await prisma.user.create({
         data: {
           firstName,
@@ -71,7 +74,7 @@ router.post(
       });
 
       const jwtPayload = { email: user.email };
-      const accessToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, {
+      const accessToken = sign(jwtPayload, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRY,
       });
 
@@ -130,7 +133,7 @@ router.post(
     const { email, password } = req.body;
     try {
       const user = await prisma.user.findUnique({ where: { email } });
-      if (!user || !(await bcrypt.compare(password, user.password))) {
+      if (!user || !(await compare(password, user.password))) {
         return res.status(401).json({
           status: "Bad request",
           message: "Authentication failed",
@@ -139,7 +142,7 @@ router.post(
       }
 
       const jwtPayload = { email: user.email };
-      const accessToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, {
+      const accessToken = sign(jwtPayload, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRY,
       });
 
@@ -166,4 +169,4 @@ router.post(
   }
 );
 
-module.exports = router;
+export default router;

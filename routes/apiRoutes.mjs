@@ -1,9 +1,10 @@
-const express = require("express");
-const router = express.Router();
-require("dotenv").config();
-const prisma = require("../config/prisma");
-const { body, validationResult } = require("express-validator");
-const authenticateUser = require("../middleware/authenticateUser");
+import { Router } from "express";
+const router = Router();
+import dotenv from "dotenv";
+dotenv.config();
+import prisma from "../config/prisma.mjs";
+import { body, validationResult } from "express-validator";
+import authenticateUser from "../middleware/authenticateUser.mjs";
 
 router.get("/users/:id", authenticateUser, async (req, res) => {
   try {
@@ -47,22 +48,10 @@ router.get("/organisations", authenticateUser, async (req, res) => {
       },
     });
 
-    if (organisations.length > 1) {
-      return res.status(200).json({
-        status: "success",
-        message: "Organisations retrieved",
-        data: { organisations },
-      });
-    }
-
-    res.status(200).json({
+    return res.status(200).json({
       status: "success",
       message: "Organisations retrieved",
-      data: {
-        orgId: organisations[0].orgId,
-        name: organisations[0].name,
-        description: organisations[0].description,
-      },
+      data: { organisations },
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: "Internal server error" });
@@ -88,9 +77,9 @@ router.get("/organisations/:orgId", authenticateUser, async (req, res) => {
         userId_organisationId: {
           userId: req.user.userId,
           organisationId: req.params.orgId,
-        }
-      }
-    })
+        },
+      },
+    });
 
     if (!userOrganisation) {
       return res
@@ -113,7 +102,7 @@ router.get("/organisations/:orgId", authenticateUser, async (req, res) => {
 });
 
 router.post(
-  "/organisation",
+  "/organisations",
   authenticateUser,
   [body("name").notEmpty().withMessage("Name is required")],
   async (req, res) => {
@@ -215,4 +204,4 @@ router.post(
   }
 );
 
-module.exports = router;
+export default router;

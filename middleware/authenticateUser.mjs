@@ -1,6 +1,8 @@
-const jwt = require("jsonwebtoken");
-const prisma = require("../config/prisma");
-require("dotenv").config();
+import jwt from "jsonwebtoken";
+const { verify } = jwt;
+import prisma from "../config/prisma.mjs";
+import dotenv from "dotenv";
+dotenv.config();
 
 const authenticateUser = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -11,7 +13,7 @@ const authenticateUser = async (req, res, next) => {
       message: "Invalid token",
     });
 
-  jwt.verify(token, process.env.JWT_SECRET, async (err, jwt_payload) => {
+  verify(token, process.env.JWT_SECRET, async (err, jwt_payload) => {
     if (err)
       return res.status(403).json({
         message: "Failed to authenticate token.",
@@ -39,4 +41,4 @@ const authenticateUser = async (req, res, next) => {
   });
 };
 
-module.exports = authenticateUser;
+export default authenticateUser;
