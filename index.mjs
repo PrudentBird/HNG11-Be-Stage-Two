@@ -15,6 +15,14 @@ app.get("/", (req, res) => {
 app.use("/api", apiRoutes);
 app.use("/auth", authRoutes);
 
+app.use((req, res, next) => {
+  res.status(404).json({ message: "Route not found" });
+});
+
+app.use((err, req, res, next) => {
+  res.status(500).json({ message: "Internal Server Error" });
+});
+
 const startServer = (port) => {
   const serverPort = port || process.env.PORT || 5000;
   return new Promise((resolve, reject) => {
