@@ -8,22 +8,20 @@ const authenticateUser = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
-  if (!token) {
+  if (!token)
     return res.status(400).json({
       status: "Bad request",
       message: "Client error",
       statusCode: 400,
     });
-  }
 
   verify(token, process.env.JWT_SECRET, async (err, jwt_payload) => {
-    if (err) {
+    if (err)
       return res.status(400).json({
         status: "Bad request",
         message: "Client error",
         statusCode: 400,
       });
-    }
 
     try {
       const user = await prisma.user.findUnique({
@@ -32,13 +30,13 @@ const authenticateUser = async (req, res, next) => {
         },
       });
 
-      if (!user) {
-        res.status(400).json({
+      if (!user)
+        return res.status(400).json({
           status: "Bad request",
           message: "Client error",
           statusCode: 400,
         });
-      }
+
       req.user = user;
 
       next();
