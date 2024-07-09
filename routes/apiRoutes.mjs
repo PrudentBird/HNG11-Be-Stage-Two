@@ -20,6 +20,25 @@ router.get("/users/:id", authenticateUser, async (req, res) => {
         .json({ status: "error", message: "User not found" });
     }
 
+    const isValidUser = user.userId === req.user.userId;
+
+    const isAuthUserOrganisationMember = await prisma.userOrganisation.findFirst({
+      where: {
+        userId: req.user.userId,
+        organisation: {
+          users: {
+            some: {
+              userId: req.params.id,
+            },
+          },
+        },
+      },
+    });
+
+    if (!isValidUser && !isAuthUserOrganisationMember) {
+      return res.status(403).json({ status: "error", message: "Access denied" });
+    }
+
     res.status(200).json({
       status: "success",
       message: "User found",
