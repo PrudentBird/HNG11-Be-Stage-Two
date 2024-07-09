@@ -47,8 +47,10 @@ router.post(
       });
 
       if (existingUser) {
-        return res.status(422).json({
-          errors: [{ field: "email", message: "Email already exists" }],
+        return res.status(400).json({
+          status: "Bad request",
+          message: "Registration unsuccessful",
+          statusCode: 400,
         });
       }
 
@@ -93,8 +95,7 @@ router.post(
         },
       });
     } catch (error) {
-      console.log(error);
-      res.status(422).json({
+      res.status(400).json({
         status: "Bad request",
         message: "Registration unsuccessful",
         statusCode: 400,

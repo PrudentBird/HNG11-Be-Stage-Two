@@ -22,21 +22,24 @@ router.get("/users/:id", authenticateUser, async (req, res) => {
 
     const isValidUser = user.userId === req.user.userId;
 
-    const isAuthUserOrganisationMember = await prisma.userOrganisation.findFirst({
-      where: {
-        userId: req.user.userId,
-        organisation: {
-          users: {
-            some: {
-              userId: req.params.id,
+    const isAuthUserOrganisationMember =
+      await prisma.userOrganisation.findFirst({
+        where: {
+          userId: req.user.userId,
+          organisation: {
+            users: {
+              some: {
+                userId: req.params.id,
+              },
             },
           },
         },
-      },
-    });
+      });
 
     if (!isValidUser && !isAuthUserOrganisationMember) {
-      return res.status(403).json({ status: "error", message: "Access denied" });
+      return res
+        .status(403)
+        .json({ status: "error", message: "Access denied" });
     }
 
     res.status(200).json({
@@ -179,7 +182,6 @@ router.post(
 
 router.post(
   "/organisations/:orgId/users",
-  authenticateUser,
   [body("userId").notEmpty().withMessage("User ID is required")],
   async (req, res) => {
     const errors = validationResult(req);
