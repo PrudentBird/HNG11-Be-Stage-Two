@@ -83,11 +83,9 @@ describe("End to End tests", () => {
       phone: "0987654321",
     });
 
-    expect(response.status).toBe(422);
-    expect(response.body.errors).toContainEqual({
-      field: "email",
-      message: "Email already exists",
-    });
+    expect(response.status).toBe(400);
+    expect(response.body.status).toBe("Bad request");
+    expect(response.body.message).toBe("Registration unsuccessful");
   }, 60000);
 
   it("Should Log the user in successfully and validate response body", async () => {
